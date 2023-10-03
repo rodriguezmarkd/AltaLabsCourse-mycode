@@ -6,6 +6,7 @@ while True:
     round = round + 1
     print('Finish the movie title, "Monty Python\'s The Life of ______"')
     answer = input("Your guess--> ")
+    answer = answer.capitalize()
 
     if answer == 'Brian':
         print('Correct')
