@@ -61,7 +61,8 @@ rooms = {
             'Shed' : {
                 'north' : 'Garden',
                 'item' : 'hammer'
-                }
+                },
+            'Sky' : {}
 
          }
 
@@ -136,5 +137,9 @@ while True:
         print('You escaped the house with the ultra rare key and magic potion... YOU WIN!')
         ## Added movement count as final score
         print('Final Score: ', movecount)
+        break
+    if currentRoom =='Sky':
+        print('Hello? Hello? Where did you go?\nI guess we should end the game here then...')
+        print('Final Score: -1')
         break
 
