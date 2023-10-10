@@ -1,0 +1,12 @@
+---
+- name: Learning how to use git
+  hosts: planetexpress
+  connection: ssh
+  gather_facts: false
+
+  tasks:
+    - name: "Create a git archive from a respository"
+      git:
+        repo: https://github.com/ansible/ansible-examples.git
+        dest: ~/ansible-examples/
+        archive: /tmp/ansible-examples.zip
