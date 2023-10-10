@@ -1,0 +1,33 @@
+---
+- name: bootstrapping a new user
+  hosts: raiders
+  connection: ssh
+  gather_facts: False
+
+  tasks:
+  - name: "Ensure apt is updated"
+    ansible.builtin.raw: "apt update -y"
+    become: yes
+
+  - name: "Bootstrap install python"
+    ansible.builtin.raw: "apt install -y python3-pip"
+    become: yes
+
+  - name: "Create the new group sandbox"
+    ansible.builtin.group:
+        name: sandbox
+        state: present
+    become: yes
+
+  - name: "Add user 'exampleuser' with the group of 'sandbox'"
+    ansible.builtin.user:
+      name: exampleuser
+      comment: "example user"
+      # password: alta3
+      state: present
+      shell: /bin/bash
+      system: no
+      createhome: yes
+      # home: /home/exampleuser
+      group: sandbox
+    become: yes
