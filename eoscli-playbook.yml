@@ -1,0 +1,22 @@
+---
+- name: Using EOS specific module to run commands
+  hosts: arista_switches
+  gather_facts: false
+  connection: network_cli
+  become: yes
+  become_method: enable
+
+  vars:
+    ansible_ssh_pass: alta3
+
+  tasks:
+    - name: run multiple commands on remote nodes
+      arista.eos.eos_command:
+        commands:
+          - show version
+          - show interfaces
+      register: results
+
+    - name: take a peek as to what is inside of "results"
+      debug:
+        var: results

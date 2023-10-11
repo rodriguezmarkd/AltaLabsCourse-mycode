@@ -1,0 +1,31 @@
+---
+- name: Using cli_command agnostic modules
+  hosts: arista_switches
+  gather_facts: false
+  connection: network_cli
+  become: yes
+  become_method: enable
+
+  vars:
+    ansible_ssh_pass: alta3
+
+  tasks:
+    - name: Run multiple commands on remote nodes
+      ansible.netcommon.cli_command:
+        command: "{{ item }}"
+      loop:
+        - show version
+        - show interfaces
+      register: results
+
+    - name: take a peek as to what is inside of "results"
+      debug:
+        var: results
+
+    - name: take a peek at "just" the JSON returned to the command show version
+      debug:
+        var: results.results[0]
+
+    - name: take a peek at "just" the JSON returned to the command show interfaces
+      debug:
+        var: results.results[1]

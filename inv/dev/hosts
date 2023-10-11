@@ -36,3 +36,16 @@ sw-2
 [arista_switches:vars]
 ansible_user=admin
 ansible_network_os=eos
+
+[aristaswitchessecure]
+; description of our arista inventory
+sw-1
+sw-2
+
+[aristaswitchessecure:vars]
+; variables specific to specific switches
+ansible_network_eos=eos
+ansible_connection=network_cli
+ansible_become=yes
+ansible_become_method=enable
+ansible_user=admin
