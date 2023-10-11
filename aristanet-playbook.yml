@@ -1,0 +1,28 @@
+---
+- name: Arista Config Saver
+  hosts: arista_switches
+  gather_facts: false
+  connection: network_cli
+  become: yes #required to run playbook as "enable"
+  become_method: enable # required when elevated status is something other than sudo
+
+  vars:
+    ansible_ssh_pass: alta3
+
+  tasks:
+    - name: Arista Fact Collection
+      eos_facts:
+        gather_subset: all
+
+    - name: Create Arista config save directory
+      file:
+        path: arista_config/
+        state: directory
+
+    - name: Arista Config Save
+      shell: "echo '{{ ansible_net_config }}' > arista_config/{{ inventory_hostname }}"
+
+    - name: Arista Archival Process
+      archive:
+        path: arista_config/{{ inventory_hostname }}
+        remove: False
