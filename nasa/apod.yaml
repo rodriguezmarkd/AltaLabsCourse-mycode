@@ -1,0 +1,27 @@
+---
+- name: Ansible playbook interacting with
+  hosts: localhost
+  connection: local
+
+  vars:
+    apod_url: "https://api.nasa.gov/planetary/apod?api_key="
+    mykey: "{{ lookup('file', '~/nasa.key') }}"
+
+  tasks:
+  - name:
+    uri:
+      method: GET
+      url: "{{ apod_url }}{{ mykey }}"
+    register: nasaread
+
+  - name: Display the contents of the variable 'nasaread'
+    debug:
+      var: nasaread
+
+  - name: Display just the explanation
+    debug:
+      var: nasaread.json.get('explanation')
+
+  - name: Display jsut the HDURL
+    debug:
+      var: nasaread.json.get('hdurl', "No HD URL for today!")
