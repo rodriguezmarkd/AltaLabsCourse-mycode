@@ -7,6 +7,7 @@ from flask import url_for
 from flask import request
 
 app = Flask(__name__)
+configparams = {}
 '''
 @app.route("/configurator/")
 def gatherparams():
@@ -21,7 +22,9 @@ def gatherparams():
 '''
 @app.route("/success/<hn>?<ia>")
 def success(hn, ia):
-    return f"Welcome {hn},\n {ia}"
+    print(configparams)
+    return render_template("iosconfig.txt", **configparams)
+#    return f"Welcome {hn},\n {ia}"
 
 @app.route("/")
 def start():
@@ -32,9 +35,15 @@ def params():
     if request.method == "POST":
         if request.form.get("host"):
             hostname = request.form.get("host")
+            configparams['hostname'] = request.form.get("host")
     if request.method == "POST":
         if request.form.get("ip"):
             ipadd = request.form.get("ip")
+            configparams['ip'] = request.form.get("ip")
+            configparams['domain'] = "domain"
+            configparams['nameserver'] = "nameserver"
+            configparams['subnet'] = "subnet"
+            configparams['gateway'] = "gateway"
     return redirect(url_for("success", hn = hostname, ia = ipadd))
 
 if __name__ == "__main__":

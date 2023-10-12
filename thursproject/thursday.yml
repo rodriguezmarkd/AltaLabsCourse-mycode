@@ -1,0 +1,42 @@
+---
+- name: Thursday Morning Project
+  hosts: alphahosts
+  gather_facts: yes
+
+  tasks:
+    - name: Ping Hosts
+      ansible.builtin.ping:
+
+    - name: Show OS Information
+      debug:
+        var: ansible_facts.os_family
+
+    - name: Show Ansible Facts
+      debug:
+        var: ansible_facts.lsb
+
+    - name: Install figlet
+      ansible.builtin.apt:
+        name: figlet
+        state: present
+      become: yes
+
+    - name: Copy a File
+      ansible.builtin.copy:
+        src: ~/mycode/thursproject/goodnewseveryone.txt
+        dest: ~/goodnewseveryone.txt
+
+    - name: Create custom directory
+      become_user: root
+      become: true
+      file:
+        path: "/home/{{ ansible_user }}/custom"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0755"
+
+    - name: Placing a custom file
+      copy:
+        dest: "~/custom/{{ ansible_user }}info.txt"
+        content: "{{ ansible_facts }}"

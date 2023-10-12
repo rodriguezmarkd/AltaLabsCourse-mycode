@@ -1,0 +1,22 @@
+---
+- name: Using Ansible to ensure files are created
+  hosts: cloud-hosts01
+  connection: ssh
+
+  gather_facts: no
+
+  tasks:
+  - name: Use file module to ensure files are created
+    copy:
+      content: ""
+      dest: ~/more-goodnews.everyone
+      force: no
+
+  - name: Search for all files within a folder
+    find:
+      path: ~/
+    register: results
+
+  - name: Show results
+    debug:
+      var: results

@@ -1,0 +1,4 @@
+[alphahosts]
+alpha	ansible_host=10.10.66.247 ansible_user=student ansible_python_interpreter=/usr/bin/python3 fileuser=student
+beta	ansible_host=10.8.114.44 ansible_user=student ansible_python_interpreter=/usr/bin/python3 fileuser=student
+charlie	ansible_host=10.11.78.43 ansible_user=student ansible_python_interpreter=/usr/bin/python3 fileuser=student
