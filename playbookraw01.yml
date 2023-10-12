@@ -1,0 +1,13 @@
+---
+- name: Exploring Ansible raw
+  hosts: tx_mid_svr
+  connection: ssh
+  gather_facts: no
+
+
+  tasks:
+    - name: Create a file over an SSH channel
+      raw: echo $HOSTNAME > newfile01.txt
+
+    - name: Create a second file over an SSH channel
+      raw: echo "Hello World" > newfile02.txt
