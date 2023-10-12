@@ -1,0 +1,16 @@
+---
+# tasks file for /home/student/mycode/roles/precheck
+- name: Getting at network interfaces
+  debug:
+    var: ansible_facts
+    verbosity: 1
+
+- name: "Precheck condition - Is switch running image {{ switch_image }}"
+  fail:
+    msg: "Ths switch does not appear to have the correct image loaded. Exciting..."
+  when: ansible_facts.net_image != switch_image
+
+- name: "Precheck condition - Is switch running image version {{ switch_image_version }}"
+  fail:
+    msg: "This switch does not appear to have corerct version of the firmware loaded"
+  when: ansible_facts.net_version != switch_image_version
