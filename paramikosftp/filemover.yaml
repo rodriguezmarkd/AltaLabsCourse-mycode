@@ -1,0 +1,12 @@
+---
+- name: Moving files with Ansible using SSH
+  hosts: pa_east_nfv
+
+  connection: ssh
+  gather_facts: no
+
+  tasks:
+    - name: Copy files from local host to target hosts
+      copy:
+        src: /home/student/filestocopy/
+        dest: ~/
