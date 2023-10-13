@@ -1,0 +1,43 @@
+<html>
+    <body>
+        version 17.6<br>
+        !<br>
+        !<br>
+        boot system switch all flash:packages.conf<br>
+        !<br>
+        !<br>
+        hostname {{ hostname }}<br>
+        !<br>
+        !<br>
+        clock timezone PST -8<br>
+        !<br>
+        !<br>
+        ip subnet-zero<br>
+        no ip source-route<br>
+        ip domain name {{ domain }}<br>
+        ip name-server {{ nameserver }}<br>
+        !<br>
+        !<br>
+        !<br>
+        interface Loopback0<br>
+        ip address {{ ip }} {{ subnet }}<br>
+        no shutdown<br>
+        !<br>
+        !<br>
+        ip default-gateway {{ gateway }}<br>
+        !<br>
+        !<br>
+        interface GigabitEthernet1/0/1<br>
+        shutdown<br>
+        !<br>
+        !<br>
+        interface GigabitEthernet1/0/2<br>
+        shutdown<br>
+        !<br>
+        !<br>
+        interface GigabitEthernet1/0/3<br>
+        shutdown<br>
+        !<br>
+        !<br>
+    </body>
+</html>

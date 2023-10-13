@@ -4,7 +4,7 @@ version 17.6
 boot system switch all flash:packages.conf
 !
 !
-hostname {{ hostname }}
+hostname sat1-fc-cor-r-a-1
 !
 !
 clock timezone PST -8
@@ -12,17 +12,17 @@ clock timezone PST -8
 !
 ip subnet-zero
 no ip source-route
-ip domain name {{ domain }}
-ip name-server {{ nameserver }}
+ip domain name amazon.com
+ip name-server 8.8.8.8
 !
 !
 !
 interface Loopback0
-ip address {{ ip }} {{ subnet }}
+ip address 10.156.237.28 255.255.255.0
 no shutdown
 !
 !
-ip default-gateway {{ gateway }}
+ip default-gateway 192.168.1.1
 !
 !
 interface GigabitEthernet1/0/1

@@ -4,10 +4,21 @@
     <meta charset="UTF-8">
     <title>Enter Switch Parameters</title>
     <form action="/params" method = "POST">
+        <center><img src="{{url_for('static', filename='kirbo.jpg')}}" height=230px width=357px><br>
+            <b>KI</b>cksta<b>R</b>t <b>B</b>y Aut<b>O</b>mation</center><br>
+        <center>"KIRBO" Tool</center>
         <p>Enter Hostname:</p>
         <p><input type = "text" name="host"></p>
         <p>Enter IP Address:</p>
         <p><input type = "text" name="ip"></p>
+        <p>Enter IP Subnet:</p>
+        <p><input type = "text" name="subnet"></p>
+        <p>Enter Domain:</p>
+        <p><input type = "text" name= "domain"></p>
+        <p>Enter Name Server:</p>
+        <p><input type = "text" name="nameserver"></p>
+        <p>Enter Default Gateway:</p>
+        <p><input type = "text" name="gateway"></p>
         <p><input type = "submit" value = "submit"></p>
     </form>
 </head>
