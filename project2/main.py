@@ -22,6 +22,7 @@ def success(hn, ia):
     sftp.put("tempconfig", "/home/bender/config")
     sftp.close()
     h.close()
+    os.remove("tempconfig")
     return render_template("iosconfig.html", **configparams)
 
 @app.route("/")
@@ -32,15 +33,12 @@ def start():
 def params():
     if request.method == "POST":
         if request.form.get("host"):
-            hostname = request.form.get("host")
             configparams['hostname'] = request.form.get("host")
-            ipadd = request.form.get("ip")
             configparams['ip'] = request.form.get("ip")
             configparams['domain'] = request.form.get("domain")
             configparams['nameserver'] = request.form.get("nameserver")
             configparams['subnet'] = request.form.get("subnet")
             configparams['gateway'] = request.form.get("gateway")
-    return redirect(url_for("success", hn = hostname, ia = ipadd))
-
+    return redirect(url_for("success", hn = configparams['hostname'],ia = configparams['ip']))
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=2224)
