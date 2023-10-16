@@ -1,0 +1,15 @@
+---
+- name: Ansible rest and tags
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    myrsakey: "{{ lookup('file','/home/student/.ssh/id_rsa.pub') }}"
+
+  tasks:
+  - name: Key prep
+    debug:
+      msg: "Your RSA key is {{ myrsakey }}"
+    tags:
+      - keytime
+      - vmprep
