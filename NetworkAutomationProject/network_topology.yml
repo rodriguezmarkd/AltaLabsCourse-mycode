@@ -1,0 +1,38 @@
+---
+#Actual proposed topology
+subnets: #strucure describing network adddress range will take ip address as method to check and add to list of hosts
+  - name: "purple"  # the ns to be created
+    subnet_ip: "10.1.1.0"
+    bridge: yes
+    cidr: "/24"
+    gw: "10.1.1.1"
+    dhcp_range: "10.1.1.21,10.1.1.150"
+
+
+  - name: "purple-core"
+    subnet_ip: "10.1.5.0"
+    bridge: no
+    cidr: "/30"
+    gw: "10.1.5.1"
+    dhcp_range: null   # core network does not have DHCP only static assignments
+    
+routers:   # describing object that can route and interface between subnets
+  - name: "core"
+    interfaces:
+      - name: "to-purple-core"
+        ip: "10.1.5.1"
+        subnet: ""
+      - name: "to-orange-core"
+        ip: "10.1.5.13"
+        subnet: ""
+      - name: "loopback"
+        ip: ""
+        subnet: ""
+    nexthop: 
+
+hosts:  # list of hosts to create
+  - name: "phost" #only need interface  check IP against subnet
+    interfaces: ""
+    subnets: ""
+    ip: ""
+    vlan: ""
