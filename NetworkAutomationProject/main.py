@@ -11,21 +11,40 @@ def populate_dict():
     
 
 def build_network(topology):
-    for key, value in topology['routers'].items():
-        print(key, value)
-        print(key)
-        i = 0
-        if key == 'routers':
-            subprocess.call(['sudo','ip','netns','add',topology['routers'][i]['name']])
-            i = i + 1
-    print(topology.keys())
-    print(topology['routers'][0]['name'])
-    print(topology['routers'][1]['name'])
-    print(topology['routers'][2]['name'])
+
+    print("Creating namespaces...")
+
+    for routers in topology['routers']:
+        print(f"Creating {routers['name']} namespace...")
+        subprocess.call(['sudo','ip','netns','add',routers['name']])
+
+    for bridges in topology['subnets']:
+        if bridges['bridge'] == True:
+            print(f"Creating {bridges['name']}bridge namespace...")
+            subprocess.call(['sudo','ip','link','add','name',bridges['name'] + 'brdg','type','bridge'])
+
+            print(f"Setting {bridges['name']}bridge to an up state...")
+            subprocess.call(['sudo','ip','link','set','dev',bridges['name'] + 'brdg','up'])
+
+    for hosts in topology['hosts']:
+        print(f"Creating {hosts['name']} namespace...")
+        subprocess.call(['sudo','ip','netns','add',hosts['name']])
+        subprocess.call(['sudo','ip','link','add',hosts['name'] + '2' + hosts['name'] + 'brdg','type','veth','peer','name',hosts['name'] + 'brdg' + '2' + hosts['name']])
+
+            #for hosts in topology['hosts']:
+            #    print(f"Connecting {hosts['name']} to {bridges['name']}bridge...")
+            #    subprocess.call(['sudo','ip','link','add',hosts['name'] + '2' + bridges['name'] + 'bridge','type','veth','peer','name',bridges['name'] + 'bridge' + '2' + hosts['name']])
+    
 def main():
     network_topology = populate_dict()
+
     build_network(network_topology)
-    #print(network_topology)
+
+    print("Showing Created Namespaces...")
+    subprocess.call(['sudo','ip','netns'])
+
+    print("Showing up bridges")
+    subprocess.call(['sudo','brctl','show'])
 
 if __name__ == '__main__':
     main()

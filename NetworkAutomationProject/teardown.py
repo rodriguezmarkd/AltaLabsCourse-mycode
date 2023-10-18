@@ -19,10 +19,12 @@ def build_network(topology):
     for hosts in topology['hosts']:
         print(f"Deleting {hosts['name']} namespace...")
         subprocess.call(['sudo','ip','netns','delete',hosts['name']])
+        subprocess.call(['sudo','ip','link','del',hosts['name'] + '2' + hosts['name'] + 'brdg','type','veth','peer','name',hosts['name'] + 'brdg' + '2' + hosts['name']])
+        subprocess.call(['sudo','ip','link','del',hosts['name'] + 'brdg' + '2' + hosts['name']])
     for bridges in topology['subnets']:
         if bridges['bridge'] == True:
-            print(f"Deleting {bridges['name']}bridge...")
-            subprocess.call(['sudo','ip','link','delete',bridges['name'] + 'bridge'])
+            print(f"Deleting {bridges['name']}brdg...")
+            subprocess.call(['sudo','ip','link','delete',bridges['name'] + 'brdg'])
 def main():
     network_topology = populate_dict()
     build_network(network_topology)
