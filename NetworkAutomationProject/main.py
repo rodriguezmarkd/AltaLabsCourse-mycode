@@ -11,7 +11,7 @@ def populate_dict():
     
 
 def build_network(topology):
-
+    bridges = []
     print("Creating namespaces...")
 
     for routers in topology['routers']:
@@ -22,18 +22,16 @@ def build_network(topology):
         if bridges['bridge'] == True:
             print(f"Creating {bridges['name']}bridge namespace...")
             subprocess.call(['sudo','ip','link','add','name',bridges['name'] + 'brdg','type','bridge'])
-
             print(f"Setting {bridges['name']}bridge to an up state...")
             subprocess.call(['sudo','ip','link','set','dev',bridges['name'] + 'brdg','up'])
 
     for hosts in topology['hosts']:
         print(f"Creating {hosts['name']} namespace...")
+        ltr = str(hosts['name'][1])
         subprocess.call(['sudo','ip','netns','add',hosts['name']])
         subprocess.call(['sudo','ip','link','add',hosts['name'] + '2' + hosts['name'] + 'brdg','type','veth','peer','name',hosts['name'] + 'brdg' + '2' + hosts['name']])
+        subprocess.call(['sudo','ip','link','set',hosts['name'] + '2' + hosts['name'] + 'brdg','netns', hosts['name']])
 
-            #for hosts in topology['hosts']:
-            #    print(f"Connecting {hosts['name']} to {bridges['name']}bridge...")
-            #    subprocess.call(['sudo','ip','link','add',hosts['name'] + '2' + bridges['name'] + 'bridge','type','veth','peer','name',bridges['name'] + 'bridge' + '2' + hosts['name']])
     
 def main():
     network_topology = populate_dict()
