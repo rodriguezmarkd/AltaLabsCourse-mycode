@@ -23,8 +23,8 @@ def build_network(topology):
         #subprocess.call(['sudo','ip','link','del',hosts['name'] + 'brdg' + '2' + hosts['name']])
     for bridges in topology['subnets']:
         if bridges['bridge'] == True:
-            print(f"Deleting {bridges['name']}brdg...")
-            subprocess.call(['sudo','ip','link','delete',bridges['name'] + 'brdg'])
+            print(f"Deleting {bridges['bridge_name']}brdg...")
+            subprocess.call(['sudo','ip','link','delete',bridges['bridge_name']])
 def main():
     network_topology = populate_dict()
     build_network(network_topology)
