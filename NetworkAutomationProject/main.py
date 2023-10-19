@@ -51,8 +51,10 @@ def build_network(topology):
         subprocess.call(['sudo','ip','link','set','dev',hosts['bridge'] + '2' + hosts['name'],'master', hosts['bridge']])
         subprocess.call(['sudo','ip','link','set','dev',hosts['bridge'] + '2' + hosts['name'],'up'])
 
-        #print(f'Configuring {hosts['name']} with an IP of {hosts['ip']}')
-        #subprocess.call('sudo','ip','netns','exec',hosts['name'],'ip','addr','add',hosts['ip'] + '/24','dev',''
+        print(f"Configuring {hosts['name']} with an IP of {hosts['ip']}")
+        subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','addr','add',hosts['ip'] + '/24','dev',hosts['if_name']])
+        subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','link','set','dev',hosts['if_name'],'up'])
+        subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','link','set','dev','lo','up'])
 
     print(f"Connecting core to NAT...")
     subprocess.call(['sudo','ip','link','add','core2nat','type','veth','peer','name','nat2core'])
