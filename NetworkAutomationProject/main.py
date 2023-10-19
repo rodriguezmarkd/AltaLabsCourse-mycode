@@ -15,6 +15,9 @@ def build_network(topology):
     print("Creating namespaces...")
 
     for bridges in topology['subnets']:
+        # Creating bridges using subnets YAML. If Bridge is not null, creates bridge. Also sets bridge to up
+        # sudo ip link add name {name} type bridge
+        # sudo ip link set dev {bridge_name} up
         if bridges['bridge'] == True:
             print(f"Creating {bridges['bridge_name']} namespace...")
             subprocess.call(['sudo','ip','link','add','name',bridges['bridge_name'],'type','bridge'])
@@ -27,19 +30,32 @@ def build_network(topology):
 
     for routers in topology['routers']:
         print(f"Creating {routers['name']} namespace...")
+        # Creates routers namespace
+        # sudo ip netns add {routers_name}
         subprocess.call(['sudo','ip','netns','add',routers['name']])
+
         if routers['ds_bridge'] != None:
-            #print(routers['ds_bridge'])
+            # sudo ip link add {routers_name}2{routers_dsbridge} type veth peer name {routers_dsbridge}2{routers_name}
+            # sudo ip link set {routers_name}2{routers_dsbridge} netns {routers_name}
+            # sudo ip link set dev {routers_dsbridge}2{routers_name} master {routers_dsbridge}
+            # sudo ip link set dev {routers_dsbridge}2{routers_name} up
             subprocess.call(['sudo','ip','link','add',routers['name'] + '2' + routers['ds_bridge'],'type','veth','peer','name',routers['ds_bridge'] + '2' + routers['name']])
             subprocess.call(['sudo','ip','link','set',routers['name'] + '2' + routers['ds_bridge'],'netns',routers['name']])
             subprocess.call(['sudo','ip','link','set','dev',routers['ds_bridge'] + '2' + routers['name'],'master',routers['ds_bridge']])
             subprocess.call(['sudo','ip','link','set','dev',routers['ds_bridge'] + '2' + routers['name'],'up'])
+
             print(f"Connecting {routers['name']} to core...")
             subprocess.call(['sudo','ip','link','add','core' + '2' + routers['name'],'type','veth','peer','name',routers['name'] + '2' + 'core'])
             subprocess.call(['sudo','ip','link','set','core' + '2' + routers['name'],'netns','core'])
             subprocess.call(['sudo','ip','link','set',routers['name'] + '2' + 'core','netns',routers['name']])
 
-        subprocess.call(['sudo','ip','netns','exec',routers['name'],'sysctl','-p','/etc/sysctl.d/10-ip-forwarding.conf'])        
+        subprocess.call(['sudo','ip','netns','exec',routers['name'],'sysctl','-p','/etc/sysctl.d/10-ip-forwarding.conf']) 
+
+        for interfaces in routers['interfaces']:
+            print(interfaces)
+            subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','addr','add',interfaces['ip'] + '/24','dev',interfaces['name']])
+            subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','link','set','dev',interfaces['name'],'up'])
+            subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','link','set','dev','lo','up'])      
         #for hosts in topology['hosts']:
 
     for hosts in topology['hosts']:
@@ -52,8 +68,11 @@ def build_network(topology):
         subprocess.call(['sudo','ip','link','set','dev',hosts['bridge'] + '2' + hosts['name'],'up'])
 
         print(f"Configuring {hosts['name']} with an IP of {hosts['ip']}")
-        subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','addr','add',hosts['ip'] + '/24','dev',hosts['if_name']])
-        subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','link','set','dev',hosts['if_name'],'up'])
+        # sudo ip netns exec {hosts_name} ip addr add {hosts_ip}/24 dev {hosts_ifname}
+        # sudo ip netns exec {hosts_name} ip link set dev {hosts_ifname} up
+        # sudo ip netns exec {hosts_name} ip link set dev lo up
+        subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','addr','add',hosts['ip'] + '/24','dev',hosts['name'] + '2' + hosts['bridge']])
+        subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','link','set','dev',hosts['name'] + '2' + hosts['bridge'],'up'])
         subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','link','set','dev','lo','up'])
 
     print(f"Connecting core to NAT...")
