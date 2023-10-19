@@ -37,8 +37,24 @@ def build_network(topology):
         print(f"Creating {routers['name']} namespace...")
         subprocess.call(['sudo','ip','netns','add',routers['name']])
         if routers['ds_bridge'] != None:
-            print(routers['ds_bridge'])
+            #print(routers['ds_bridge'])
+            subprocess.call(['sudo','ip','link','add',routers['name'] + '2' + routers['ds_bridge'],'type','veth','peer','name',routers['ds_bridge'] + '2' + routers['name']])
+            subprocess.call(['sudo','ip','link','set',routers['name'] + '2' + routers['ds_bridge'],'netns',routers['name']])
+            subprocess.call(['sudo','ip','link','set','dev',routers['ds_bridge'] + '2' + routers['name'],'master',routers['ds_bridge']])
+            subprocess.call(['sudo','ip','link','set','dev',routers['ds_bridge'] + '2' + routers['name'],'up'])
+            print(f"Connecting {routers['name']} to core...")
+            subprocess.call(['sudo','ip','link','add','core' + '2' + routers['name'],'type','veth','peer','name',routers['name'] + '2' + 'core'])
+            subprocess.call(['sudo','ip','link','set','core' + '2' + routers['name'],'netns','core'])
+            subprocess.call(['sudo','ip','link','set',routers['name'] + '2' + 'core','netns',routers['name']])
         #for hosts in topology['hosts']:
+
+    print(f"Connecting core to NAT...")
+    subprocess.call(['sudo','ip','link','add','core2nat','type','veth','peer','name','nat2core'])
+    subprocess.call(['sudo','ip','link','set','core2nat','netns','core'])
+
+    subprocess.call(['sudo','sysctl','net.bridge.bridge-nf-call-iptables=0'])
+    subprocess.call(['echo','\'net.ipv4.ip_forward', '=', '1'])
+    subprocess.call(['net.ipv6.conf.default.forwarding','=','1'])
 
 def main():
     network_topology = populate_dict()
