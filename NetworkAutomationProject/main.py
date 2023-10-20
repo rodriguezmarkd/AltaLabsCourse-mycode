@@ -67,23 +67,27 @@ def deploy_hosts(topology):
 def deploy_router_ips(topology):
     for routers in topology['routers']:
         for interfaces in routers['interfaces']:
+            #print(f"Adding {interfaces}")
             subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','addr','add',interfaces['ip'],'dev',interfaces['name']])
             subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','link','set','dev',interfaces['name'],'up'])
             subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','link','set','dev','lo','up'])   
 
 def add_routes(topology):
     for network in topology['subnets']:
+        print(f"Adding {network}")
         subprocess.call(['sudo','ip','netns','exec','core','ip','route','add',network['network'],'via',network['route']])
     for hosts in topology['hosts']:
+        print(f"Adding {hosts}")
         subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','route','add','default','via',hosts['default']])
     for routers in topology['routers']:
         #if routers['nexthop'] != None:
+        print(f"Adding {routers}")
         subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','route','add','default','via',routers['nexthop']])
 
 def configure_nat():
 
     ##Take out if necessary vvv
-    subprocess.call(['sudo','ip','netns','exec','core','ip','route','add','default','via','10.1.5.18'])
+    #subprocess.call(['sudo','ip','netns','exec','core','ip','route','add','default','via','10.1.5.18'])
 
     subprocess.call(['sudo','ip','link','add','core2nat','type','veth','peer','name','nat2core'])
     subprocess.call(['sudo','ip','link','set','core2nat','netns','core'])
@@ -100,7 +104,12 @@ def configure_nat():
     subprocess.call(['sudo','iptables','-t','nat','-A','POSTROUTING','-s','10.1.0.0/16','-o','ens3','-j','MASQUERADE']) 
     subprocess.call(['sudo','iptables','-t','filter','-A','FORWARD','-i','ens3','-o','nat2core','-j','ACCEPT'])  
     subprocess.call(['sudo','iptables','-t','filter','-A','FORWARD','-o','ens3','-i','nat2core','-j','ACCEPT'])
-    subprocess.call(['sudo','ip','route','add','10.1.0.0/16','via','10.1.5.17'])  
+    subprocess.call(['sudo','ip','route','add','10.1.0.0/16','via','10.1.5.17']) 
+
+    subprocess.call(['sudo','iptables','-t','filter','-A','FORWARD','-i','ens3','-o','nat2crout','-j','ACCEPT'])  
+    subprocess.call(['sudo','iptables','-t','filter','-A','FORWARD','-o','ens3','-i','nat2crout','-j','ACCEPT'])
+    subprocess.call(['sudo','ip','netns','exec','core','ip','route','add','default','via','10.1.5.18']) 
+
 
 def build_network(topology):
     print("Creating namespaces...")

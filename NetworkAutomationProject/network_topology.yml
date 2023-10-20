@@ -144,10 +144,6 @@ routers:   # describing object that can route and interface between subnets
         ip: "10.1.5.9/30"
         subnet: ""
         peer: "wrouter"
-      - name: "lo"
-        ip: ""
-        subnet: ""
-        peer: null
     nexthop: "10.1.5.18"
     ds_bridge: null
 
