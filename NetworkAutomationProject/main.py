@@ -71,7 +71,8 @@ def deploy_router_ips(topology):
             subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','link','set','dev',interfaces['name'],'up'])
             subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','link','set','dev','lo','up'])   
 
-
+def add_routes(topology):
+    for 
 
 def build_network(topology):
     print("Creating namespaces...")
@@ -86,7 +87,8 @@ def build_network(topology):
     print("Adding Router IP Addresses...")
     deploy_router_ips(topology)
 
-
+    print("Adding routes to devices...")
+    add_routes(topology)
 
     print(f"Connecting core to NAT...")
     subprocess.call(['sudo','ip','link','add','core2nat','type','veth','peer','name','nat2core'])
