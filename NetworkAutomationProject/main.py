@@ -81,16 +81,20 @@ def add_routes(topology):
         subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','route','add','default','via',routers['nexthop']])
 
 def configure_nat():
+
+    ##Take out if necessary vvv
+    subprocess.call(['sudo','ip','netns','exec','core','ip','route','add','default','via','10.1.5.18'])
+
     subprocess.call(['sudo','ip','link','add','core2nat','type','veth','peer','name','nat2core'])
     subprocess.call(['sudo','ip','link','set','core2nat','netns','core'])
 
-    subprocess.call(['sudo','ip','netns','exec','core','ip','add','10.1.5.17/30','dev','core2nat'])
+    subprocess.call(['sudo','ip','netns','exec','core','ip','addr','add','10.1.5.17/30','dev','core2nat'])
     subprocess.call(['sudo','ip','netns','exec','core','ip','link','set','dev','core2nat','up'])
 
     subprocess.call(['sudo','ip','addr','add','10.1.5.18/30','dev','nat2core'])
 
-    subprocess.call(['sudo','ip','addr','add','192.168.90.3/30','dev','pbridge2prouter'])
-    subprocess.call(['sudo','ip','addr','add','192.168.90.4/30','dev','pbridge'])
+    subprocess.call(['sudo','ip','addr','add','192.168.90.3/24','dev','pbridge2prouter'])
+    subprocess.call(['sudo','ip','addr','add','192.168.90.4/24','dev','pbridge'])
 
     subprocess.call(['sudo','iptables','-t','nat','-F'])
     subprocess.call(['sudo','iptables','-t','nat','-A','POSTROUTING','-s','10.1.0.0/16','-o','ens3','-j','MASQUERADE']) 
