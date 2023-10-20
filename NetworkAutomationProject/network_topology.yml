@@ -2,7 +2,7 @@
 #Actual proposed topology
 subnets: #strucure describing network adddress range will take ip address as method to check and add to list of hosts
   - name: "purple"  # the ns to be created
-    network: "10.1.1.0"
+    network: "10.1.1.0/24"
     bridge: yes
     bridge_name: "pbridge"
     router_name: "prouter"
@@ -21,7 +21,7 @@ subnets: #strucure describing network adddress range will take ip address as met
 #    dhcp_range: null   # core network does not have DHCP only static assignments
 
   - name: "orange"
-    network: "10.1.4.0"
+    network: "10.1.4.0/24"
     bridge: yes
     bridge_name: "obridge"
     router_name: "orouter"
@@ -40,7 +40,7 @@ subnets: #strucure describing network adddress range will take ip address as met
 #    dhcp_range: null
 
   - name: "yellow"
-    network: "10.1.2.0"
+    network: "10.1.2.0/24"
     bridge: yes
     bridge_name: "ybridge"
     router_name: "yrouter"
@@ -59,7 +59,7 @@ subnets: #strucure describing network adddress range will take ip address as met
 #    dhcp_range: null
 
   - name: "white"
-    network: "10.1.3.0"
+    network: "10.1.3.0/24"
     bridge: yes
     bridge_name: "wbridge"
     router_name: "wrouter"
@@ -81,102 +81,106 @@ routers:   # describing object that can route and interface between subnets
   - name: "prouter"
     interfaces:
       - name: "prouter2core"
-        ip: "10.1.5.2"
+        ip: "10.1.5.2/30"
         subnet: ""
         peer: "core2prouter"
       - name: "prouter2pbridge"
-        ip: "10.1.1.1"
+        ip: "10.1.1.1/24"
         subnet: ""
         peer: null
-    nexthop: ""
+    nexthop: "10.1.5.1"
     ds_bridge: "pbridge"
   - name: "orouter"
     interfaces:
       - name: "orouter2core"
-        ip: "10.1.5.14"
+        ip: "10.1.5.14/30"
         subnet: ""
         peer: "core2orouter"
       - name: "orouter2obridge"
-        ip: "10.1.4.1"
+        ip: "10.1.4.1/24"
         subnet: ""
         peer: null
-    nexthop: ""
+    nexthop: "10.1.5.13"
     ds_bridge: "obridge"
   - name: "yrouter"
     interfaces:
       - name: "yrouter2core"
-        ip: "10.1.5.9"
+        ip: "10.1.5.6/30"
         subnet: ""
         peer: "core2yrouter"
       - name: "yrouter2ybridge"
-        ip: "10.1.2.1"
+        ip: "10.1.2.1/24"
         subnet: ""
         peer: null
-    nexthop: ""
+    nexthop: "10.1.5.5"
     ds_bridge: "ybridge"
   - name: "wrouter"
     interfaces:
       - name: "wrouter2core"
-        ip: "10.1.5.10"
+        ip: "10.1.5.10/30"
         subnet: ""
         peer: "core2wrouter"
       - name: "wrouter2wbridge"
-        ip: "10.1.3.21"
+        ip: "10.1.3.1/24"
         subnet: ""
         peer: null
-    nexthop: ""
+    nexthop: "10.1.5.9"
     ds_bridge: "wbridge"
   - name: "core"
     interfaces:
       - name: "core2prouter"
-        ip: "10.1.5.1"
+        ip: "10.1.5.1/30"
         subnet: ""
         peer: "prouter"
       - name: "core2orouter"
-        ip: "10.1.5.13"
+        ip: "10.1.5.13/30"
         subnet: ""
         peer: "orouter"
       - name: "core2yrouter"
-        ip: "10.1.5.5"
+        ip: "10.1.5.5/30"
         subnet: ""
         peer: "yrouter"
       - name: "core2wrouter"
-        ip: "10.1.5.9"
+        ip: "10.1.5.9/30"
         subnet: ""
         peer: "wrouter"
       - name: "lo"
         ip: ""
         subnet: ""
         peer: null
-    nexthop:
+    nexthop: "10.1.5.18"
     ds_bridge: null
 
 hosts:  # list of hosts to create
   - name: "phost" #only need interface  check IP against subnet
 #    interfaces: 
     if_name: "phost2pbrg"
-    ip: "10.1.1.21"
+    ip: "10.1.1.21/24"
     vlan: ""
     subnets: "purple"
     bridge: "pbridge"
+    default: "10.1.1.1"
   - name: "ohost"
 #    interfaces:
     if_name: "ohost2obrg"
-    ip: "10.1.1.24"
+    ip: "10.1.4.21/24"
     vlan: ""
     subnets: "orange"
     bridge: "obridge"
+    default: "10.1.4.1"
   - name: "yhost"
 #    interfaces: 
     if_name: "yhost2ybrg"
-    ip: "10.1.2.24"
+    ip: "10.1.2.21/24"
     vlan: ""
     subnets: "yellow"
     bridge: "ybridge"
+    default: "10.1.2.1"
   - name: "whost"
 #    interfaces: 
     if_name: "whostwobrg"
-    ip: "10.1.3.24"
+    ip: "10.1.3.21/24"
     vlan: ""
     subnets: "white"
     bridge: "wbridge"
+    default: "10.1.3.1"

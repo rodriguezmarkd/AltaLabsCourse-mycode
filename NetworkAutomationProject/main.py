@@ -60,19 +60,43 @@ def deploy_hosts(topology):
         # sudo ip netns exec {hosts_name} ip addr add {hosts_ip}/24 dev {hosts_ifname}
         # sudo ip netns exec {hosts_name} ip link set dev {hosts_ifname} up
         # sudo ip netns exec {hosts_name} ip link set dev lo up
-        subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','addr','add',hosts['ip'] + '/24','dev',hosts['name'] + '2' + hosts['bridge']])
+        subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','addr','add',hosts['ip'],'dev',hosts['name'] + '2' + hosts['bridge']])
         subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','link','set','dev',hosts['name'] + '2' + hosts['bridge'],'up'])
         subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','link','set','dev','lo','up'])
 
 def deploy_router_ips(topology):
     for routers in topology['routers']:
         for interfaces in routers['interfaces']:
-            subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','addr','add',interfaces['ip'] + '/24','dev',interfaces['name']])
+            subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','addr','add',interfaces['ip'],'dev',interfaces['name']])
             subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','link','set','dev',interfaces['name'],'up'])
             subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','link','set','dev','lo','up'])   
 
 def add_routes(topology):
-    for 
+    for network in topology['subnets']:
+        subprocess.call(['sudo','ip','netns','exec','core','ip','route','add',network['network'],'via',network['route']])
+    for hosts in topology['hosts']:
+        subprocess.call(['sudo','ip','netns','exec',hosts['name'],'ip','route','add','default','via',hosts['default']])
+    for routers in topology['routers']:
+        #if routers['nexthop'] != None:
+        subprocess.call(['sudo','ip','netns','exec',routers['name'],'ip','route','add','default','via',routers['nexthop']])
+
+def configure_nat():
+    subprocess.call(['sudo','ip','link','add','core2nat','type','veth','peer','name','nat2core'])
+    subprocess.call(['sudo','ip','link','set','core2nat','netns','core'])
+
+    subprocess.call(['sudo','ip','netns','exec','core','ip','add','10.1.5.17/30','dev','core2nat'])
+    subprocess.call(['sudo','ip','netns','exec','core','ip','link','set','dev','core2nat','up'])
+
+    subprocess.call(['sudo','ip','addr','add','10.1.5.18/30','dev','nat2core'])
+
+    subprocess.call(['sudo','ip','addr','add','192.168.90.3/30','dev','pbridge2prouter'])
+    subprocess.call(['sudo','ip','addr','add','192.168.90.4/30','dev','pbridge'])
+
+    subprocess.call(['sudo','iptables','-t','nat','-F'])
+    subprocess.call(['sudo','iptables','-t','nat','-A','POSTROUTING','-s','10.1.0.0/16','-o','ens3','-j','MASQUERADE']) 
+    subprocess.call(['sudo','iptables','-t','filter','-A','FORWARD','-i','ens3','-o','nat2core','-j','ACCEPT'])  
+    subprocess.call(['sudo','iptables','-t','filter','-A','FORWARD','-o','ens3','-i','nat2core','-j','ACCEPT'])
+    subprocess.call(['sudo','ip','route','add','10.1.0.0/16','via','10.1.5.17'])  
 
 def build_network(topology):
     print("Creating namespaces...")
@@ -90,12 +114,10 @@ def build_network(topology):
     print("Adding routes to devices...")
     add_routes(topology)
 
-    print(f"Connecting core to NAT...")
-    subprocess.call(['sudo','ip','link','add','core2nat','type','veth','peer','name','nat2core'])
-    subprocess.call(['sudo','ip','link','set','core2nat','netns','core'])
+    print("Configuring NAT and DHCP...")
+    configure_nat()
 
-    subprocess.call(['sudo','sysctl','net.bridge.bridge-nf-call-iptables=0'])
-    subprocess.call(['echo','\'net.ipv4.ip_forward','=','1\n','net.ipv6.conf.default.forwarding','=','1\n','net.ipv6.conf.all.forwarding','=','1\'','|','sudo','tee','/etc/sysctl.d/10-ip-forwarding.conf'])
+    print(f"Connecting core to NAT...")
 
 def main():
     network_topology = populate_dict()
