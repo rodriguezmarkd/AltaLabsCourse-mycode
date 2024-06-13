@@ -1,6 +1,0 @@
-dns.example.com
-sonic.dns.example.com
-lookup.supershoes.example.com
-dns.example.com
-sonic.dns.example.com
-lookup.supershoes.example.com
